@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="citrixnosleep:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/citrixnosleep_jar</output-path>
+    <root id="archive" name="citrixnosleep.jar">
+      <element id="module-output" name="citrixnosleep" />
+    </root>
+  </artifact>
+</component>
