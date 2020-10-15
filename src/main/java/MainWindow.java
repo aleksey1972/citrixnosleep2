@@ -61,7 +61,7 @@ public class MainWindow extends JDialog {
 
         buttonStart.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-//                System.out.println("Start");
+                System.out.println("Start");
                 setTimerEnable();
                 setEnableButtons();
                 createTimer();
@@ -70,7 +70,7 @@ public class MainWindow extends JDialog {
 
         buttonStop.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-//                System.out.println("Stop");
+                System.out.println("Stop");
                 setTimerDiable();
                 buttonStop.setEnabled(false);
             }
