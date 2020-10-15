@@ -18,7 +18,7 @@ public class MainWindow extends JDialog {
     private Robot robot = null;
     private Random rand = new Random();
 
-    final private long PERIOD = 4L * 60 * 1000;
+    final private long PERIOD = 7L * 60 * 1000;
 
     public boolean isTimerEnabled() {
         return timerEnabled;
