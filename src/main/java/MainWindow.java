@@ -18,7 +18,7 @@ public class MainWindow extends JDialog {
     private Robot robot = null;
     private Random rand = new Random();
 
-    final private long PERIOD = 4L * 60 * 1000;
+    final private long PERIOD = 7L * 60 * 1000;
 
     public boolean isTimerEnabled() {
         return timerEnabled;
@@ -61,7 +61,7 @@ public class MainWindow extends JDialog {
 
         buttonStart.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-//                System.out.println("Start");
+                System.out.println("Start");
                 setTimerEnable();
                 setEnableButtons();
                 createTimer();
@@ -70,7 +70,7 @@ public class MainWindow extends JDialog {
 
         buttonStop.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-//                System.out.println("Stop");
+                System.out.println("Stop");
                 setTimerDiable();
                 buttonStop.setEnabled(false);
             }
