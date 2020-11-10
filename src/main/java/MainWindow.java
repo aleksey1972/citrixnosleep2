@@ -18,7 +18,8 @@ public class MainWindow extends JDialog {
     private Robot robot = null;
     private Random rand = new Random();
 
-    final private long PERIOD = 7L * 60 * 1000;
+    // Т.к. у Skype таймаут 5 минут
+    final private long PERIOD = 5L * 60 * 1000;
 
     public boolean isTimerEnabled() {
         return timerEnabled;
