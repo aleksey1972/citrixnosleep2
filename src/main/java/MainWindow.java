@@ -53,6 +53,7 @@ public class MainWindow extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonCancel);
+        System.out.println("Execute");
 
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -71,7 +72,7 @@ public class MainWindow extends JDialog {
 
         buttonStop.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println("Stop");
+                System.out.println("Stop...");
                 setTimerDiable();
                 buttonStop.setEnabled(false);
             }
