@@ -17,6 +17,7 @@ public class MainWindow extends JDialog {
     private int MAX_WIDTH = 0;
     private Robot robot = null;
     private Random rand = new Random();
+    private TimerTask task;
 
     // Т.к. у Skype таймаут 5 минут
     final private long PERIOD = 5L * 60 * 1000;
@@ -53,7 +54,7 @@ public class MainWindow extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonCancel);
-        System.out.println("Execute");
+        System.out.println("Program Executed");
 
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -66,15 +67,17 @@ public class MainWindow extends JDialog {
                 System.out.println("Start");
                 setTimerEnable();
                 setEnableButtons();
-                createTimer();
+                task = createTimer();
             }
         });
 
         buttonStop.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println("Stop...");
+                System.out.println("Stop");
                 setTimerDiable();
-                buttonStop.setEnabled(false);
+                task.cancel();
+                setEnableButtons();
+//                buttonStop.setEnabled(false);
             }
         });
 
@@ -124,23 +127,24 @@ public class MainWindow extends JDialog {
         buttonStop.setEnabled(timerEnabled);
     }
 
-    public void createTimer() {
+    public TimerTask createTimer() {
         TimerTask repeatedTask = new TimerTask() {
             public void run() {
 //                System.out.println("Go...");
                 if (isTimerEnabled()) {
                     moveCursor();
-                } else {
-                    System.out.println("Timer break");
-                    setEnableButtons();
-                    cancel();
+//                } else {
+//                    System.out.println("Timer break");
+//                    setEnableButtons();
+//                    cancel();
                 }
             }
         };
 //        System.out.println("Timer create... ");
         Timer timer = new Timer("MainWindow timer");
-
         timer.scheduleAtFixedRate(repeatedTask, 0L, PERIOD);
+
+        return repeatedTask;
     }
 
     private void moveCursor() {
