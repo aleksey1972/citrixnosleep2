@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,6 +20,7 @@ public class MainWindow extends JDialog {
     private Robot robot = null;
     private Random rand = new Random();
     private TimerTask task;
+    private SimpleDateFormat formatForDateNow = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
     // Т.к. у Skype таймаут 5 минут
     final private long PERIOD = 5L * 60 * 1000;
@@ -54,7 +57,7 @@ public class MainWindow extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonCancel);
-        System.out.println("Program Executed");
+        printLog("Program Executed");
 
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -64,7 +67,7 @@ public class MainWindow extends JDialog {
 
         buttonStart.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println("Start");
+                printLog("Start");
                 setTimerEnable();
                 setEnableButtons();
                 task = createTimer();
@@ -73,7 +76,7 @@ public class MainWindow extends JDialog {
 
         buttonStop.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println("Stop");
+                printLog("Stop");
                 setTimerDiable();
                 task.cancel();
                 setEnableButtons();
@@ -101,11 +104,15 @@ public class MainWindow extends JDialog {
         setMaxWidth(gd.getDisplayMode().getWidth());
         setMaxHeight(gd.getDisplayMode().getHeight());
 
+        // Работ
         try {
             robot = new Robot();
         } catch (AWTException e) {
             e.printStackTrace();
         }
+
+        // Инициализация
+//        formatForDateNow = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
     }
 
@@ -152,11 +159,17 @@ public class MainWindow extends JDialog {
         int width = rand.nextInt(getMaxWidth());
 
         // Move the cursor
-        System.out.println(String.format("Move to %4d x %4d", height, width));
+//        System.out.println(String.format("Move to %4d x %4d", height, width));
+        printLog(String.format("Move to %4d x %4d", height, width));
         if (robot != null) {
             robot.mouseMove(height, width);
         }
 
+    }
+
+    private void printLog(String msg) {
+        Date dateNow = new Date();
+        System.out.println(String.format("%s | %s", formatForDateNow.format(dateNow), msg));
     }
 
     {
