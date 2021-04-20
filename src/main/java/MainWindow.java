@@ -23,7 +23,7 @@ public class MainWindow extends JDialog {
     private SimpleDateFormat formatForDateNow = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
     // Т.к. у Skype таймаут 5 минут
-    final private long PERIOD = 5L * 60 * 1000;
+    final private long PERIOD = 4L * 60 * 1000;
 
     public boolean isTimerEnabled() {
         return timerEnabled;
@@ -119,6 +119,7 @@ public class MainWindow extends JDialog {
     private void onCancel() {
         // add your code here if necessary
         dispose();
+        printLog("Exit");
     }
 
     public static void main(String[] args) {
