@@ -54,6 +54,7 @@ public class MainWindow extends JDialog {
     }
 
     public MainWindow() {
+        setEnableButtons();
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonCancel);
@@ -112,7 +113,6 @@ public class MainWindow extends JDialog {
         }
 
         // Инициализация
-//        formatForDateNow = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
     }
 
@@ -123,11 +123,20 @@ public class MainWindow extends JDialog {
     }
 
     public static void main(String[] args) {
-        MainWindow dialog = new MainWindow();
-        dialog.setEnableButtons();
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
+        System.out.println("main...");
+
+//        MainWindow dialog = new MainWindow();
+        SwingUtilities.invokeLater(
+                new Runnable() {
+                    public void run() {
+                        MainWindow dialog = new MainWindow();
+                        dialog.pack();
+                        dialog.setVisible(true);
+                        System.exit(0);
+                    }
+                }
+        );
+
     }
 
     public void setEnableButtons() {
@@ -160,7 +169,6 @@ public class MainWindow extends JDialog {
         int width = rand.nextInt(getMaxWidth());
 
         // Move the cursor
-//        System.out.println(String.format("Move to %4d x %4d", height, width));
         printLog(String.format("Move to %4d x %4d", height, width));
         if (robot != null) {
             robot.mouseMove(height, width);
