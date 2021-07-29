@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -12,6 +13,8 @@ public class MainWindow extends JDialog {
     private JButton buttonCancel;
     private JButton buttonStart;
     private JButton buttonStop;
+    private JCheckBox checkBox_AutoStop;
+    private JTextField textField_TimeValue;
 
     private boolean timerEnabled = false;
 
@@ -19,7 +22,8 @@ public class MainWindow extends JDialog {
     private int MAX_WIDTH = 0;
     private Robot robot = null;
     private Random rand = new Random();
-    private TimerTask task;
+    private TimerTask task = null;
+    private Timer timerAutoStop = null;
     private SimpleDateFormat formatForDateNow = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
     // Т.к. у Skype таймаут 5 минут
@@ -53,6 +57,63 @@ public class MainWindow extends JDialog {
         this.MAX_WIDTH = MAX_WIDTH;
     }
 
+    public void autoStopTimerCreate(String timeValue) {
+        TimerTask repeatedTask = new TimerTask() {
+            public void run() {
+                printLog("autoStopTimerCreate.Go...");
+                buttonStopAction();
+            }
+        };
+
+        // https://spec-zone.ru/RU/Java/Docs/7/api/java/util/Timer.html
+        timerAutoStop = new Timer("AutoStop timer");
+        SimpleDateFormat formatForDateStop = new SimpleDateFormat("dd.MM.yyyy");
+        Date dateStop = new Date();
+        String sDateStop = formatForDateStop.format(dateStop) + " " + timeValue;
+        printLog("autoStopTimerCreate.nextTime = " + sDateStop);
+        formatForDateStop.applyPattern("dd.MM.yyyy HH:mm");
+        try {
+            dateStop = formatForDateStop.parse(sDateStop);
+        } catch (ParseException e) {
+            printLog("Указано не корректное время: AutoStopTimer -> " + timeValue);
+            return;
+        }
+        timerAutoStop.schedule(repeatedTask, dateStop);
+    }
+
+    public void autoStopTimerOff() {
+        printLog("autoStopTimerOff");
+        if (timerAutoStop != null) {
+            timerAutoStop.cancel();
+            timerAutoStop = null;
+            checkBox_AutoStop.setSelected(false);
+        }
+    }
+
+    void buttonStopAction() {
+        printLog("Stop");
+        setTimerDiable();
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+        setEnableButtons();
+    }
+
+    void checkBox_AutoStopAction() {
+        boolean bStarted = checkBox_AutoStop.isSelected();
+//        printLog("addActionListener => " + bStarted);
+        if (bStarted) {
+            // Включаем Авто выход
+            autoStopTimerCreate(textField_TimeValue.getText());
+        } else {
+            // Выключаем
+            autoStopTimerOff();
+        }
+    }
+
+    ;
+
     public MainWindow() {
         setEnableButtons();
         setContentPane(contentPane);
@@ -77,11 +138,7 @@ public class MainWindow extends JDialog {
 
         buttonStop.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-                printLog("Stop");
-                setTimerDiable();
-                task.cancel();
-                setEnableButtons();
-//                buttonStop.setEnabled(false);
+                buttonStopAction();
             }
         });
 
@@ -100,6 +157,12 @@ public class MainWindow extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
+        checkBox_AutoStop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                checkBox_AutoStopAction();
+            }
+        });
+
         // Get Srceen parameters
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         setMaxWidth(gd.getDisplayMode().getWidth());
@@ -113,6 +176,7 @@ public class MainWindow extends JDialog {
         }
 
         // Инициализация
+        checkBox_AutoStopAction();
 
     }
 
@@ -214,10 +278,17 @@ public class MainWindow extends JDialog {
         buttonStop.setText("Стоп");
         panel1.add(buttonStop, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel3, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
-        panel3.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        panel3.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 3, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        checkBox_AutoStop = new JCheckBox();
+        checkBox_AutoStop.setSelected(true);
+        checkBox_AutoStop.setText("Авто остановка");
+        panel3.add(checkBox_AutoStop, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        textField_TimeValue = new JTextField();
+        textField_TimeValue.setText("18:10");
+        panel3.add(textField_TimeValue, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
     }
 
     /**
