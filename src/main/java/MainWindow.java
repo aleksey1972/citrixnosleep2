@@ -298,4 +298,10 @@ public class MainWindow extends JDialog {
         return contentPane;
     }
 
+    /*
+    Во-первых, для понимания процесса лучше начать с того. что зайти в меню IDEA
+    «File -> Settings» — там «Editor -> GUI Designer» и установить флажок Generate GUI Into: в Java source code.
+    (это немного поможет пониманию процесса на первом этапе — потом можно будет убрать обратно).
+     */
+
 }
