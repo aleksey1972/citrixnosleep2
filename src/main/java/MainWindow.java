@@ -72,7 +72,7 @@ public class MainWindow extends JDialog {
         SimpleDateFormat formatForDateStop = new SimpleDateFormat("dd.MM.yyyy");
         Date dateStop = new Date();
         String sDateStop = formatForDateStop.format(dateStop) + " " + timeValue;
-        printLog("Auto timer started. Next stop at: " + sDateStop);
+        printLog("Auto timer On. Next stop at: " + sDateStop);
         formatForDateStop.applyPattern("dd.MM.yyyy HH:mm");
         try {
             dateStop = formatForDateStop.parse(sDateStop);
@@ -88,7 +88,7 @@ public class MainWindow extends JDialog {
         if (timerAutoStop != null) {
             timerAutoStop.cancel();
             timerAutoStop = null;
-            checkBox_AutoStop.setSelected(false);
+            //checkBox_AutoStop.setSelected(false);
         }
     }
 
@@ -123,9 +123,9 @@ public class MainWindow extends JDialog {
         // Выключаем "Авто выход"
         autoStopTimerOff();
 
-        checkBox_AutoStop.setSelected(false);
+//        checkBox_AutoStop.setSelected(false);
         checkBox_AutoStop.setEnabled(true);
-        textField_TimeValue.setEnabled(true);
+//        textField_TimeValue.setEnabled(true);
     }
 
     void checkBox_AutoStopAction() {
