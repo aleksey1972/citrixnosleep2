@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainWindow extends JDialog {
     private JPanel contentPane;
@@ -16,29 +18,29 @@ public class MainWindow extends JDialog {
     private JCheckBox checkBox_AutoStop;
     private JTextField textField_TimeValue;
 
-    private boolean timerEnabled = false;
+    private boolean moverTimerEnabled = false;
 
     private int MAX_HEIGHT = 0;
     private int MAX_WIDTH = 0;
     private Robot robot = null;
     private Random rand = new Random();
-    private TimerTask task = null;
+    private TimerTask taskMove = null;
     private Timer timerAutoStop = null;
     private SimpleDateFormat formatForDateNow = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
     // Т.к. у Skype таймаут 5 минут
     final private long PERIOD = 4L * 60 * 1000;
 
-    public boolean isTimerEnabled() {
-        return timerEnabled;
+    public boolean isMoverTimerEnabled() {
+        return moverTimerEnabled;
     }
 
     public void setTimerEnable() {
-        this.timerEnabled = true;
+        this.moverTimerEnabled = true;
     }
 
     public void setTimerDiable() {
-        this.timerEnabled = false;
+        this.moverTimerEnabled = false;
     }
 
     public int getMaxHeight() {
@@ -70,7 +72,7 @@ public class MainWindow extends JDialog {
         SimpleDateFormat formatForDateStop = new SimpleDateFormat("dd.MM.yyyy");
         Date dateStop = new Date();
         String sDateStop = formatForDateStop.format(dateStop) + " " + timeValue;
-        printLog("autoStopTimerCreate.nextTime = " + sDateStop);
+        printLog("Auto timer started. Next stop at: " + sDateStop);
         formatForDateStop.applyPattern("dd.MM.yyyy HH:mm");
         try {
             dateStop = formatForDateStop.parse(sDateStop);
@@ -82,7 +84,7 @@ public class MainWindow extends JDialog {
     }
 
     public void autoStopTimerOff() {
-        printLog("autoStopTimerOff");
+        printLog("Auto timer Off");
         if (timerAutoStop != null) {
             timerAutoStop.cancel();
             timerAutoStop = null;
@@ -90,26 +92,68 @@ public class MainWindow extends JDialog {
         }
     }
 
+    void buttonStartAction() {
+        // Нажатие кнопка "Старт"
+        printLog("Start");
+        setTimerEnable();
+        setEnableButtons();
+        taskMove = createTimer();
+
+        boolean bStarted = checkBox_AutoStop.isSelected();
+        if (bStarted) {
+            // Включаем "Авто выход"
+            autoStopTimerCreate(textField_TimeValue.getText());
+        }
+
+        checkBox_AutoStop.setEnabled(false);
+        textField_TimeValue.setEnabled(false);
+
+    }
+
     void buttonStopAction() {
+        // Нажатие кнопка "Стоп"
         printLog("Stop");
         setTimerDiable();
-        if (task != null) {
-            task.cancel();
-            task = null;
+        if (taskMove != null) {
+            taskMove.cancel();
+            taskMove = null;
         }
         setEnableButtons();
+
+        // Выключаем "Авто выход"
+        autoStopTimerOff();
+
+        checkBox_AutoStop.setSelected(false);
+        checkBox_AutoStop.setEnabled(true);
+        textField_TimeValue.setEnabled(true);
     }
 
     void checkBox_AutoStopAction() {
+        // Переключатель "Авто"
         boolean bStarted = checkBox_AutoStop.isSelected();
-//        printLog("addActionListener => " + bStarted);
+        //printLog("addActionListener => " + bStarted);
         if (bStarted) {
-            // Включаем Авто выход
-            autoStopTimerCreate(textField_TimeValue.getText());
+//            // Включаем "Авто выход"
+//            autoStopTimerCreate(textField_TimeValue.getText());
+            buttonStart.setEnabled(true);
+            if (!checkTimeString(textField_TimeValue.getText())) {
+                printLog("Указано не корректное время: AutoStopTimer");
+                checkBox_AutoStop.setSelected(false);
+                return;
+            }
+            textField_TimeValue.setEnabled(false);
         } else {
-            // Выключаем
-            autoStopTimerOff();
+//            // Выключаем "Авто выход"
+//            autoStopTimerOff();
+            buttonStart.setEnabled(false);
+            textField_TimeValue.setEnabled(true);
         }
+    }
+
+    boolean checkTimeString(String timeValue) {
+        Pattern pattern = Pattern.compile("^[0-2][0-9]:[0-6][0-9]$");
+        Matcher matcher = pattern.matcher(timeValue);
+        return matcher.find();
     }
 
     ;
@@ -129,10 +173,7 @@ public class MainWindow extends JDialog {
 
         buttonStart.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
-                printLog("Start");
-                setTimerEnable();
-                setEnableButtons();
-                task = createTimer();
+                buttonStartAction();
             }
         });
 
@@ -204,15 +245,15 @@ public class MainWindow extends JDialog {
     }
 
     public void setEnableButtons() {
-        buttonStart.setEnabled(!timerEnabled);
-        buttonStop.setEnabled(timerEnabled);
+        buttonStart.setEnabled(!moverTimerEnabled);
+        buttonStop.setEnabled(moverTimerEnabled);
     }
 
     public TimerTask createTimer() {
         TimerTask repeatedTask = new TimerTask() {
             public void run() {
 //                System.out.println("Go...");
-                if (isTimerEnabled()) {
+                if (isMoverTimerEnabled()) {
                     moveCursor();
 //                } else {
 //                    System.out.println("Timer break");
@@ -222,7 +263,7 @@ public class MainWindow extends JDialog {
             }
         };
 //        System.out.println("Timer create... ");
-        Timer timer = new Timer("MainWindow timer");
+        Timer timer = new Timer("MainWindow MoverTimer");
         timer.scheduleAtFixedRate(repeatedTask, 0L, PERIOD);
 
         return repeatedTask;
